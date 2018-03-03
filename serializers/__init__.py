@@ -6,6 +6,7 @@ ma = Marshmallow()
 
 ## ---------------------- Serializers ---------------------- ##
 
+
 ## ---------------------- Users ---------------------- ##
 class UserSchema(ma.ModelSchema):
     class Meta:
