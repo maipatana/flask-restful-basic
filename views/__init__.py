@@ -1,12 +1,12 @@
 from flask import request, jsonify, g
 from flask_restful import Resource
-from flask_httpauth import HTTPBasicAuth
-from models import User, Port
-from serializers import user_schema, users_schema, port_schema, ports_schema
-from helpers import POST_DATA, PUT_DATA, DELETE, USER_REGISTER
-from permissions import UserisPortAdmin
-
-auth = HTTPBasicAuth()
+from models import User, Port, Project
+from serializers import user_schema, users_schema, project_schema, projects_schema, port_schema, ports_schema
+from helpers import POST_DATA, PUT_DATA, DELETE
+from permissions import UserisOwner, UserisPortAdmin, UserisPortEditor, UserisProjectAdmin, UserisProjectEditor
+from permissions.auth import auth
+from .port_view import PortViewSet, PortsViewSet
+from .user_view import USER_AUTH, USER_REGISTER
 
 
 class UsersViewSet(Resource):
@@ -28,28 +28,29 @@ class UserViewSet(Resource):
     def delete(self, user_id):
         return DELETE(User, user_id)
 
-class PortsViewSet(Resource):
+class ProjectsViewSet(Resource):
     def get(self):
-        return ports_schema.dump(Port.query.all())
+        return projects_schema.dump(Project.query.all())
     
     @auth.login_required
     def post(self):
-        return POST_DATA(port_schema)
+        if len(g.user.port_admin) == 0:
+            return jsonify({'message': 'User has to be admin in at least one Port.'})
+        return POST_DATA(project_schema)
 
-class PortViewSet(Resource):
-    def get(self, port_id):
-        return port_schema.dump(Port.query.get(port_id))
+class ProjectViewSet(Resource):
+    def get(self, project_id):
+        return project_schema.dump(Project.query.get(project_id))
     
     @auth.login_required
-    @UserisPortAdmin
-    def put(self, port_id):
-        return PUT_DATA(port_schema, Port, port_id)
+    @UserisProjectAdmin
+    def put(self, project_id):
+        return PUT_DATA(project_schema, Project, project_id)
     
     @auth.login_required
-    @UserisPortAdmin
-    def delete(self, port_id):
-        return DELETE(Port, port_id)
-
+    @UserisProjectAdmin
+    def delete(self, project_id):
+        return DELETE(Project, project_id)
 
 ## ------------------------ Authentication and Token ------------------------ ##
 
@@ -76,26 +77,3 @@ class AuthforToken(Resource):
             'refresh_token': refresh_token.decode('ascii'),
             'username': g.user.username })
 
-    @auth.verify_password
-    def verify_password(username, password):
-        # first try to authenticate by token
-        auth_token = request.headers.get('Authorization')
-        if auth_token:
-            user = User.verify_auth_token(auth_token.split(' ')[1])
-            if not user:
-                return False
-        else:
-            # try to authenticate with username/password
-            json_data = request.get_json()
-            try:
-                username = json_data['username']
-                password = json_data['password']
-            except KeyError:
-                return False
-            if username is None or password is None:
-                return False
-            user = User.query.filter_by(username = username).first()
-            if not user or not user.verify_password(password):
-                return False
-        g.user = user
-        return True
