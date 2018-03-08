@@ -74,6 +74,8 @@ def DELETE_PORT(id):
         return jsonify({'message': 'not exists'})
     try:
         item.active = False
+        item.old_slug = item.slug
+        item.slug = ''
         db.session.commit()
     except Exception as e:
         print(e)

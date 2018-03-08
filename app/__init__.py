@@ -21,3 +21,4 @@ app.config['SECRET_KEY'] = 'this-is-the-seret-key-that-I-should-keep-it-secret-w
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+

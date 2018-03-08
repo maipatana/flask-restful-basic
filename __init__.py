@@ -1,6 +1,5 @@
 from flask_restful import Api
 from views import UsersViewSet, UserViewSet, PortsViewSet, PortViewSet, ProjectsViewSet, ProjectViewSet, AuthforToken, RefreshToken
-
 from app import app, db
 
 api = Api(app)
