@@ -32,3 +32,14 @@ class Port(db.Model):
 
     def __repr__(self):
         return '<Port {}>'.format(self.name)
+    
+    def deactivate_port(self, oldslug):
+        self.active = False
+        self.old_slug = self.slug
+        self.slug = oldslug
+        return "Port is deactivaed"
+
+    def activate_port(self, newslug):
+        self.active = True
+        self.slug = newslug
+        return "Port is activaed"

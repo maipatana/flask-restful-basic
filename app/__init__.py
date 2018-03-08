@@ -1,4 +1,6 @@
-from flask import Flask
+import logging
+from logging.handlers import RotatingFileHandler
+from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -22,3 +24,39 @@ app.config['SECRET_KEY'] = 'this-is-the-seret-key-that-I-should-keep-it-secret-w
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
+# handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
+# handler.setLevel(logging.INFO)
+# app.logger.addHandler(handler)
+
+
+
+file_handler = RotatingFileHandler('python.log', maxBytes=1024 * 1024 * 100, backupCount=20)
+#file_handler.setLevel(logging.ERROR)
+# formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# file_handler.setFormatter(formatter)
+# logformat = """
+# Request:   {method} {path}
+# IP:        {ip}
+# User:      {user}
+# Agent:     {agent_platform} | {agent_browser} {agent_browser_version}
+# Raw Agent: {agent}
+#             """.format(
+#                 method = request.method,
+#                 path = request.path,
+#                 ip = request.remote_addr,
+#                 agent_platform = request.user_agent.platform,
+#                 agent_browser = request.user_agent.browser,
+#                 agent_browser_version = request.user_agent.version,
+#                 agent = request.user_agent.string,
+#                 user=user
+#             )
+
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s '
+    '[in %(pathname)s:%(lineno)d]'
+))
+
+app.logger.addHandler(file_handler)
+# app.logger.warning('testing warning log')
+# app.logger.error('testing error log')
+app.logger.info('------------------ STARTING SERVER ------------------')

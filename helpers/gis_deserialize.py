@@ -1,6 +1,7 @@
 from marshmallow_sqlalchemy import ModelConverter
 from marshmallow import fields
 from geoalchemy2 import Geography
+from geoalchemy2 import functions as geo_funcs
 from app import db
 
 class GeoConverter(ModelConverter):
@@ -10,14 +11,14 @@ class GeoConverter(ModelConverter):
     })
 
 
-
 class GeographySerializationField(fields.String):
     def _serialize(self, value, attr, obj):
         if value is None:
             return value
         else:
             if attr == 'location':
-                return {'latitude': db.session.scalar(geo_funcs.ST_X(value)), 'longitude': db.session.scalar(geo_funcs.ST_Y(value))}
+                return {'lng': db.session.scalar(geo_funcs.ST_X(value)), 
+                'lat': db.session.scalar(geo_funcs.ST_Y(value))}
             else:
                 return None
 
@@ -37,6 +38,7 @@ class GeographySerializationField(fields.String):
             return value
         else:
             if attr == 'location':
-                return WKTGeographyElement('POINT({0} {1})'.format(str(value.get('longitude')), str(value.get('latitude'))))
+                return 'POINT({} {})'.format(str(value.get('lng')), str(value.get('lat')))
+                # return WKTGeographyElement('POINT({0} {1})'.format(str(value.get('lng')), str(value.get('lat'))))
             else:
                 return None
