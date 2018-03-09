@@ -1,5 +1,5 @@
 from app import db
-from flask import request, jsonify, g
+from flask import request, jsonify, g, make_response
 from serializers import user_schema
 from models import User
 
@@ -11,9 +11,9 @@ def USER_REGISTER():
         username = json_data['username']
         password = json_data['password']
     except KeyError:
-        return jsonify({'message': 'No input data provided'}), 400 # missing arguments
+        return make_response(jsonify({'message': 'No input data provided'}), 400) # missing arguments
     if username is None or password is None:
-        return jsonify({'message': 'No input data provided'}), 400 # missing arguments
+        return make_response(jsonify({'message': 'No input data provided'}), 400) # missing arguments
     if User.query.filter_by(username = username).first() is not None:
         return jsonify({'message': 'already exists', 'field': 'username', 'value': username}) # existing user
     
@@ -24,7 +24,7 @@ def USER_REGISTER():
         db.session.commit()
     except Exception as e:
         print(e)
-        return jsonify({'message': 'failed'}), 422
+        return make_response(jsonify({'message': 'failed'}), 422)
     return user_schema.dump(user)
 
 def USER_AUTH():
@@ -32,12 +32,14 @@ def USER_AUTH():
     auth_token = request.headers.get('Authorization')
     if auth_token:
         user = User.verify_auth_token(auth_token.split(' ')[1])
+        if user == "Token Expired":
+            return make_response(jsonify({'message': 'No input data provided'}), 400)
     else:
         json_data = request.get_json()
         username = json_data['username']
         password = json_data['password']
         if username is None or password is None:
-            return jsonify({'message': 'No input data provided'}), 400 # missing arguments
+            return make_response(jsonify({'message': 'No input data provided'}), 400) # missing arguments
         user = User.query.filter_by(username = username).first()
         if user is not None:
             user = User.query.filter_by(username = username_or_token).first()
