@@ -18,7 +18,8 @@ class UsersViewSet(Resource):
 
 class UserViewSet(Resource):
     def get(self, user_id):
-        return user_schema.dump(User.query.get(user_id))
+        return user_schema.dump(User.query.filter_by(username=user_id).first())
+        #return user_schema.dump(User.query.get(user_id))
     
     @auth.login_required
     def put(self, user_id):

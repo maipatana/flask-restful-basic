@@ -42,7 +42,7 @@ def USER_AUTH():
             return make_response(jsonify({'message': 'No input data provided'}), 400) # missing arguments
         user = User.query.filter_by(username = username).first()
         if user is not None:
-            user = User.query.filter_by(username = username_or_token).first()
+            user = User.query.filter_by(username = username).first()
             if not user or not user.verify_password(password):
                 return False
         else:
