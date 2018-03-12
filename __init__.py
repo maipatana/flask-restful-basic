@@ -1,35 +1,23 @@
 from flask import jsonify, request, make_response
 from flask_restful import Api
-from views import UsersViewSet, UserViewSet, PortsViewSet, PortViewSet, ProjectsViewSet, ProjectViewSet, AuthforToken, RefreshToken
+from views import UsersViewSet, UserViewSet, PortsViewSet, PortViewSet, AuthforToken, RefreshToken
 from app import app, db
 import traceback
 
 api = Api(app)
 
 api.add_resource(UsersViewSet, '/api/users/')
-api.add_resource(UserViewSet, '/api/user/<user_id>')
+api.add_resource(UserViewSet, '/api/users/<user_id>')
 
 api.add_resource(PortsViewSet, '/api/ports/')
-api.add_resource(PortViewSet, '/api/port/<port_id>')
-
-api.add_resource(ProjectsViewSet, '/api/projects/')
-api.add_resource(ProjectViewSet, '/api/project/<project_id>')
+api.add_resource(PortViewSet, '/api/ports/<port_id>')
 
 api.add_resource(AuthforToken, '/api/token/')
 api.add_resource(RefreshToken, '/api/refresh-token/')
 
-# @app.errorhandler(500)
-# def internal_error(exception):
-#     app.logger.error(exception)
-#     return jsonify({'message': 'error'}), 500
-
 @app.errorhandler(404)
 def not_exist(exception):
     return make_response(jsonify({'message': 'not exists'}), 404)
-
-# @app.route("/favicon.ico")
-# def favicon():
-#     return None
 
 @app.errorhandler(Exception)
 def exceptions(e):

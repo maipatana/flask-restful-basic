@@ -21,10 +21,6 @@ class User(db.Model):
     port_editor =  db.relationship("PortEditors", backref="user", lazy='dynamic')
     port_member =  db.relationship("PortMembers", backref="user", lazy='dynamic')
 
-    project_admin =  db.relationship("ProjectAdmins", backref="user", lazy='dynamic')
-    project_editor =  db.relationship("ProjectEditors", backref="user", lazy='dynamic')
-    project_member =  db.relationship("ProjectMembers", backref="user", lazy='dynamic')
-
     following = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -59,7 +55,7 @@ class User(db.Model):
         s = Serializer(app.config['SECRET_KEY'], expires_in = expiration, salt='activate-salt')
         return s.dumps({ 'id': self.id })
     
-    def generate_refresh_token(self, expiration = 86400):
+    def generate_refresh_token(self, expiration = 36000):
         s = Serializer(app.config['SECRET_KEY'], expires_in = expiration, salt='refresh-token-salt')
         return s.dumps({ 'id': self.id })
 

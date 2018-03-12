@@ -19,19 +19,3 @@ def UserisPortEditor(fn):
         else:
             return jsonify({'message': 'The user is not authorized'})
     return wrapper
-
-def UserisProjectAdmin(fn):
-    def wrapper(*args, **kw):
-        if kw['project_id'] in [i.project.id for i in g.user.project_admin]:
-            return fn(*args, **kw)
-        else:
-            return jsonify({'message': 'The user is not authorized'})
-    return wrapper
-
-def UserisProjectEditor(fn):
-    def wrapper(*args, **kw):
-        if kw['project_id'] in [i.project.id for i in g.user.project_editor]:
-            return fn(*args, **kw)
-        else:
-            return jsonify({'message': 'The user is not authorized'})
-    return wrapper

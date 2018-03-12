@@ -8,10 +8,9 @@ class Port(db.Model):
     id = db.Column(db.String(36), default=generate_uuid, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     slug = db.Column(db.String(40), unique=True, nullable=False)
-    old_slug = db.Column(db.String(40))
     address = db.Column(db.Text)
     description = db.Column(db.Text)
-    location = db.Column(Geography(geometry_type='POINT', srid=4326))
+    # location = db.Column(Geography(geometry_type='POINT', srid=4326))
     website = db.Column(db.String(60))
     tel = db.Column(db.String(20))
     email = db.Column(db.String(40))
@@ -20,10 +19,6 @@ class Port(db.Model):
     admins =  db.relationship("PortAdmins", backref="port", lazy='dynamic')
     editors =  db.relationship("PortEditors", backref="port", lazy='dynamic')
     members =  db.relationship("PortMembers", backref="port", lazy='dynamic')
-    
-    projects = db.relationship("ProjectDescription", backref="port", lazy='dynamic')
-
-    services = db.relationship('Service', backref='port', lazy='dynamic')
 
     created = db.Column(db.DateTime, default=datetime.utcnow)
     updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -33,13 +28,8 @@ class Port(db.Model):
     def __repr__(self):
         return '<Port {}>'.format(self.name)
     
-    def deactivate_port(self, oldslug):
+    def deactivate_port(self):
         self.active = False
-        self.old_slug = self.slug
-        self.slug = oldslug
-        return "Port is deactivaed"
 
-    def activate_port(self, newslug):
+    def activate_port(self):
         self.active = True
-        self.slug = newslug
-        return "Port is activaed"
